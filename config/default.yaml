@@ -1,0 +1,101 @@
+# Tammuz yapilandirmasi.
+#
+# Tum yollari ayarlamak icin:
+#   config/local.yaml dosyasina sadece degistirmek istediginiz alanlari yazabilirsiniz
+#   (config/local.yaml otomatik olarak default.yaml ile birlestirilir, .gitignore'dadir).
+
+paths:
+  data_dir: data
+  raw_db: data/raw/herakles.db
+  models_dir: data/models
+  datasets_dir: data/datasets
+  processed_dir: data/processed
+  images_dir: data/processed/images
+  masks_dir: data/processed/masks
+  lancedb_dir: data/processed/lancedb
+  exports_dir: data/processed/exports
+  pairs_parquet: data/processed/pairs.parquet
+  embeddings_parquet: data/processed/embeddings.parquet
+  changes_parquet: data/processed/changes.parquet
+
+sync:
+  # Public indirme URL'si (GitHub Release veya baska bir konum).
+  # Bos birakilirsa yalnizca --ssh yolu ile cekim calisir.
+  url: ""
+  # Sunucudan cekim (ozel, acik kaynak disinda). ~/.ssh/config host adi.
+  ssh_host: hetzner-ormantakip
+  ssh_db_path: /opt/herakles/repo/data/herakles.db
+
+db:
+  zoom: 16
+
+embed:
+  # timm model adi: DINOv2 tabanli, remote sensing genellemesi guclu.
+  # Hiz onemliyse base, kalite onemliyse large kullanilabilir.
+  model: vit_base_patch14_dinov2.lvd142m
+  # model: vit_large_patch14_dinov2.lvd142m
+  batch_size: 32
+  device: auto
+  # Bu degerin ALTINDAKI cosine benzerligi "degisim olabilir" olarak isaretler.
+  similarity_threshold: 0.92
+
+filter:
+  # pairs.parquet uzerinden degisim adayi secimi.
+  # dino_similarity >= similarity_threshold ise "semantik olarak ayni" kabul edilip elenir.
+  min_largest_run: 2
+  min_change_ratio: 0.0
+  # Mevcut (zayif) EuroSAT etiketlerinden en az bir tarafi belli olanlari oncelemek icin
+  # opsiyonel agirlik; siniflandirma adimindan sonra degisim tipi belirlenir.
+  keep_no_label: true
+
+classify:
+  eurosat_repo_id: tanganke/eurosat
+  eurosat_train_file: data/train-00000-of-00001.parquet
+  eurosat_test_file: data/test-00000-of-00001.parquet
+  probe_path: data/models/eurosat_dinov2_probe.pt
+  probe_epochs: 12
+  probe_lr: 0.003
+  probe_batch_size: 256
+  # Bu güvenin altinda etiket temizlenir (Herakles ile ayni felsefe).
+  confidence_floor: 0.5
+
+narrate:
+  enabled: false
+  # OpenAI uyumlu herhangi bir ucdan calisir: DeepSeek, Ollama, vLLM, LM Studio...
+  base_url: ""
+  model: deepseek-ai/DeepSeek-V4-Flash
+  api_key_env: TAMMUZ_API_KEY
+  temperature: 0.1
+  max_tokens: 400
+  batch_size: 8
+  # API cagrisi basina cift gorsel gonderilecekse true
+  two_images: true
+
+mask:
+  # Before/after farki ile degisim bolgesini bulma.
+  cell_size: 16
+  diff_threshold: 28
+  min_area: 4
+
+enrich:
+  # Onem skoru agirliklari (toplam 1.0).
+  importance_weights:
+    change_ratio: 0.3
+    magnitude: 0.3
+    land_impact: 0.2
+    recency: 0.2
+  hotspot_eps_km: 15
+  hotspot_min_samples: 5
+  # narrate calistirildiysa, AI "gurultu" dedigi kayitlari dusur.
+  drop_ai_false: false
+
+vector:
+  # LanceDB'ye yazilacak embedding boyutu.
+  table: changes
+  k_default: 6
+
+serve:
+  host: 127.0.0.1
+  port: 8787
+  # Haritada bir anda gosterilecek maksimum feature (ustu grid haritasi).
+  max_features: 4000

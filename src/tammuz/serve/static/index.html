@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tammuz - Arazi Degisim Haritasi</title>
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="map"></div>
+
+  <div id="panel">
+    <div class="panel-head">
+      <img src="/logo.png" alt="Tammuz logosu" class="logo">
+      <h1>Tammuz</h1>
+      <span id="total-label" class="muted">yukleniyor...</span>
+    </div>
+
+    <div id="filters">
+      <label class="field-label">Degisim turu</label>
+      <div id="type-pills" class="pills"></div>
+
+      <label class="field-label">Tarih araligi (to_date)</label>
+      <div class="date-row">
+        <input type="date" id="date-from">
+        <span class="muted">-</span>
+        <input type="date" id="date-to">
+      </div>
+
+      <label class="field-label">Zaman oynatma (maks. yil)</label>
+      <input type="range" id="year-play" min="2014" max="2026" value="2026" step="1">
+      <div class="play-row">
+        <span id="year-label" class="muted">2026</span>
+        <button id="play-btn" class="btn">Oynat</button>
+        <button id="reset-filter" class="btn ghost">Sifirla</button>
+      </div>
+
+      <label class="checkbox"><input type="checkbox" id="only-ai"> Yalnizca AI onayli degisimler</label>
+    </div>
+  </div>
+
+  <div id="legend" class="hidden"></div>
+
+  <div id="detail" class="hidden">
+    <button id="detail-close" class="btn ghost">Kapat</button>
+    <div id="detail-body"></div>
+  </div>
+
+  <div id="status" class="muted"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
