@@ -50,12 +50,17 @@ make setup          # sanal ortam + tum bagimliliklar
 
 ## Kullanım
 
-Önce ham Herakles veritabanını indirin (iki yoldan biri):
+Önce ham Herakles veritabanını indirin (üç yoldan biri):
 
 ```bash
+bash scripts/fetch-db.sh                    # GitHub Release'ten parcali indirme (oneri, ~11 GB)
 tammuz sync --url https://ornek-adres/herakles.db     # public konum
 tammuz sync --ssh hetzner-ormantakip                  # kendi sunucumuzdan
 ```
+
+Ham veritabanı, GitHub Releases üzerinden 2 GB'lık parçalar halinde yayınlanır
+(`raw-db-*` etiketleri). `scripts/fetch-db.sh` parçaları indirip birleştirir ve
+sha256 ile doğrular; böylece aynı komut hem yerelde hem bulutta çalışır.
 
 Sonra işlem hattını uçtan uca çalıştırın:
 

@@ -5,10 +5,18 @@
 
 ## 1. sync
 
-Ham Herakles veritabanını indirir. İki kaynak desteklenir:
+Ham Herakles veritabanını indirir. Üç kaynak desteklenir:
 
-- `--url`: Public indirme adresi. `config/sync.url` üzerinden de tanımlanabilir.
-- `--ssh <host>`: `~/.ssh/config` üzerinden kendi sunucumuzdan `scp` ile çeker.
+- `bash scripts/fetch-db.sh`: Ham DB'nin GitHub Release'ten parçalı indirilip
+  birleştirilmesi (önerilen yol, hem yerelde hem bulutta aynı çalışır).
+- `tammuz sync --url <adres>`: Tek parça halinde public indirme adresi.
+- `tammuz sync --ssh <host>`: `~/.ssh/config` üzerinden kendi sunucumuzdan
+  `scp` ile çeker (özel kullanım).
+
+Ham veritabanı GitHub Releases üzerinden `raw-db-*` etiketiyle, her biri
+~2 GB olan parçalar halinde yayınlanır (`herakles.db.part-aa` ... `part-af`).
+`scripts/fetch-db.sh` bunları indirir, sırayla birleştirir ve sha256 ile
+doğrular.
 
 ## 2. pairs
 
